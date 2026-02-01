@@ -1,0 +1,32 @@
+{
+  "name": "nextjs-mysql-redis-minio",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/my-next-app",
+
+  "forwardPorts": [3000, 3306, 6379, 9000, 9001],
+
+  "remoteUser": "node",
+
+  "remoteEnv": {
+    "PATH": "/usr/local/bin:/usr/local/sbin:${containerEnv:PATH}"
+  },
+
+  "postCreateCommand": "cd /workspaces/my-next-app && pnpm install",
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "eslint.validate": [
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact"
+        ]
+      }
+    }
+  }
+}

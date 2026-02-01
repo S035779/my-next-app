@@ -1,0 +1,44 @@
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { findUserById } from '../../../../db/users.repo';
+import UserEditForm from './UserEditForm';
+import { deleteUserAction } from '../../../../actions/users';
+
+type Props = { params: Promise<{ id: string }> };
+
+/**
+ * ユーザー編集ページ
+ * @param params パスパラメーター
+ * @returns JSX.Element
+ */
+export default async function UserEditPage({ params }: Props) {
+  const { id: idStr } = await params;
+  const id = Number(idStr);
+  if (!Number.isFinite(id)) notFound();
+
+  const user = await findUserById(id);
+  if (!user) notFound();
+
+  return (
+    <main style={{ padding: 16 }}>
+      <p>
+        <Link href="/users">← Back</Link>
+      </p>
+
+      <h1>Edit User</h1>
+
+      {/* update */}
+      <UserEditForm id={user.id} email={user.email} name={user.name ?? null} />
+
+      <hr style={{ margin: '16px 0' }} />
+
+      {/* delete */}
+      <form action={deleteUserAction}>
+        <input type="hidden" name="id" value={String(user.id)} />
+        <button type="submit" style={{ color: 'red' }}>
+          Delete
+        </button>
+      </form>
+    </main>
+  );
+}
