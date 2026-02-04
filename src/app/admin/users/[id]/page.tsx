@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { findUserById } from '../../../../db/users.repo';
+import { findUserById } from '../../../../db/users.repo.next';
 import UserEditForm from './UserEditForm';
 import { deleteUserAction } from '../../../../actions/users';
 
@@ -22,7 +22,7 @@ export default async function UserEditPage({ params }: Props) {
   return (
     <main style={{ padding: 16 }}>
       <p>
-        <Link href="/users">← Back</Link>
+        <Link href="/admin/users">← Back</Link>
       </p>
 
       <h1>Edit User</h1>

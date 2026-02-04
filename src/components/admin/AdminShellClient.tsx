@@ -11,8 +11,8 @@ const navSections: NavSection[] = [
   {
     title: '各種管理',
     items: [
-      { href: '/users', label: 'ユーザー管理', icon: Users },
-      { href: '/users/new', label: 'ユーザー作成', icon: UserPlus },
+      { href: '/admin/users', label: 'ユーザー管理', icon: Users },
+      { href: '/admin/users/new', label: 'ユーザー作成', icon: UserPlus },
     ],
   },
   {

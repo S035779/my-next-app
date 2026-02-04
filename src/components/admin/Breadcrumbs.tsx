@@ -7,7 +7,7 @@ import { cn } from '../../lib/cn';
 type Crumb = { href: string; label: string };
 
 function userLabel(path: string) {
-  // /users/new, /users/[id] の表記を調整
+  // /admin/users/new, /admin/users/[id] の表記を調整
   if (path === 'new') return '新規作成';
   if (/^\d+$/.test(path)) return `#${path}`;
   return path;
@@ -18,16 +18,19 @@ function buildCrumbs(pathname: string): Crumb[] {
 
   const crumbs: Crumb[] = [{ href: '/', label: 'ホーム' }];
 
-  // /users...
+  // /admin/users...
   if (parts[0] === 'users') {
-    crumbs.push({ href: '/users', label: 'ユーザー管理' });
+    crumbs.push({ href: '/admin/users', label: 'ユーザー管理' });
 
     if (parts.length >= 2) {
       const second = parts[1];
       if (second === 'new') {
-        crumbs.push({ href: '/users/new', label: '新規作成' });
+        crumbs.push({ href: '/admin/users/new', label: '新規作成' });
       } else {
-        crumbs.push({ href: `/users/${second}`, label: userLabel(second) });
+        crumbs.push({
+          href: `/admin/users/${second}`,
+          label: userLabel(second),
+        });
       }
     }
     return crumbs;

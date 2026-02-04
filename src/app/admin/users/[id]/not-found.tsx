@@ -12,7 +12,7 @@ export default function NotFound() {
         指定されたユーザーは存在しません（削除済み、またはURLのIDが不正です）。
       </p>
       <p>
-        <Link href="/users">← ユーザー一覧に戻る</Link>
+        <Link href="/admin/users">← ユーザー一覧に戻る</Link>
       </p>
     </main>
   );

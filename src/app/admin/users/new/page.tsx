@@ -9,7 +9,7 @@ export default function NewUserPage() {
   return (
     <main style={{ padding: 16 }}>
       <p>
-        <Link href="/users">← ユーザー一覧に戻る</Link>
+        <Link href="/admin/users">← ユーザー一覧に戻る</Link>
       </p>
 
       <h1>Create User</h1>
