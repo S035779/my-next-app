@@ -1,15 +1,20 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
 const isAdminRoute = createRouteMatcher(['/admin(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (!isAdminRoute(req)) return;
+  if (!isAdminRoute(req)) return NextResponse.next();
 
-  // ログイン必須（未ログインは sign-in に誘導）
-  await auth.protect({
-    unauthenticatedUrl: '/sign-in',
-    unauthorizedUrl: '/forbidden',
-  });
+  const { userId } = await auth();
+
+  if (!userId) {
+    const signInUrl = new URL('/sign-in', req.url);
+    signInUrl.searchParams.set('redirect_url', new URL(req.url).pathname);
+    return NextResponse.redirect(signInUrl);
+  }
+
+  return NextResponse.next();
 });
 
 // /admin 配下だけで proxy を走らせる（最小・高速）
