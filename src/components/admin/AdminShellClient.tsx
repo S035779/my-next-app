@@ -169,7 +169,7 @@ export default function AdminShellClient({
         </header>
 
         <main className="p-4 bg-gray-50">
-          <div className="mx-auto max-w-5xl bg-white border border-gray-200 rounded-2xl p-4">
+          <div className="w-full bg-white border border-gray-200 rounded-2xl p-4">
             {children}
           </div>
         </main>

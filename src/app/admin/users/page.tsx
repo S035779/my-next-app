@@ -7,7 +7,6 @@ import { listUsers } from '../../../db/users.repo.next';
  */
 export default async function UsersPage() {
   const rows = await listUsers(50);
-
   return (
     <>
       <div

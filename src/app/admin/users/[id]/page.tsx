@@ -20,7 +20,7 @@ export default async function UserEditPage({ params }: Props) {
   if (!user) notFound();
 
   return (
-    <main style={{ padding: 16 }}>
+    <div className="px-6 py-4">
       <p>
         <Link href="/admin/users">← Back</Link>
       </p>
@@ -39,6 +39,6 @@ export default async function UserEditPage({ params }: Props) {
           Delete
         </button>
       </form>
-    </main>
+    </div>
   );
 }
