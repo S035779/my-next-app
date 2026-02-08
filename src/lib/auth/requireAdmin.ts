@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { forbidden, redirect } from 'next/navigation';
+import { forbidden } from 'next/navigation';
 import { getRoleFromSessionClaims } from './role';
 
 /**
@@ -8,13 +8,12 @@ import { getRoleFromSessionClaims } from './role';
  */
 export async function requireAdmin(): Promise<void> {
   const { userId, sessionClaims } = await auth();
-  
+
+  // 未ログインは middleware 側で redirect される想定
   if (!userId) {
-    redirect('/sign-in');
+    forbidden(); // ここに来るのは基本 “想定外” 扱い（あるいは return; でもOK）
   }
 
   const role = getRoleFromSessionClaims(sessionClaims);
-  if (role !== 'admin') {
-    forbidden(); // 403
-  }
+  if (role !== 'admin') forbidden();
 }

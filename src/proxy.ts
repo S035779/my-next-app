@@ -1,23 +1,20 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
 
 const isAdminRoute = createRouteMatcher(['/admin(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (!isAdminRoute(req)) return NextResponse.next();
+  if (!isAdminRoute(req)) return;
 
-  const { userId } = await auth();
+  const { userId, redirectToSignIn } = await auth();
 
+  // ✅ 未ログインは「元のURL(req.url)」を returnBackUrl に入れて /sign-in へ
   if (!userId) {
-    const signInUrl = new URL('/sign-in', req.url);
-    signInUrl.searchParams.set('redirect_url', new URL(req.url).pathname);
-    return NextResponse.redirect(signInUrl);
+    return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  return NextResponse.next();
+  // ログイン済みなら通す（admin判定は requireAdmin で）
 });
 
-// /admin 配下だけで proxy を走らせる（最小・高速）
 export const config = {
   matcher: ['/admin/:path*'],
 };

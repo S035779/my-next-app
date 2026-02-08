@@ -2,10 +2,18 @@
 
 import { useState } from 'react';
 import { UserButton } from '@clerk/nextjs';
-import { Users, UserPlus, Settings, PanelLeftClose, Menu } from 'lucide-react';
+import {
+  Users,
+  UserPlus,
+  Settings,
+  PanelLeftClose,
+  Menu,
+  LogOut,
+} from 'lucide-react';
 import AdminNav, { type NavSection } from './AdminNav';
 import Breadcrumbs from './Breadcrumbs';
 import { cn } from '../../lib/cn';
+import LogoutButton from './LogoutButton';
 
 const navSections: NavSection[] = [
   {
@@ -17,7 +25,7 @@ const navSections: NavSection[] = [
   },
   {
     title: 'システム',
-    items: [{ href: '/settings', label: '設定', icon: Settings }],
+    items: [{ href: '/admin/settings', label: '設定', icon: Settings }],
   },
 ];
 
@@ -92,14 +100,41 @@ export default function AdminShellClient({
           className={cn(
             'mt-auto pt-4 border-t border-gray-200 w-full',
             collapsed
-              ? 'grid place-items-center'
+              ? 'flex flex-col items-center gap-2'
               : 'flex items-center justify-between',
           )}
         >
           {!collapsed && (
             <span className="text-xs text-gray-500">利用者情報</span>
           )}
-          <UserButton />
+
+          <div
+            className={cn(
+              collapsed
+                ? 'flex flex-col items-center gap-2'
+                : 'flex items-center gap-3',
+            )}
+          >
+            <UserButton />
+            {/* 明示的ログアウト */}
+            {!collapsed && (
+              <LogoutButton>
+                <span className="text-sm text-gray-600 hover:text-gray-900">
+                  ログアウト
+                </span>
+              </LogoutButton>
+            )}
+            {collapsed && (
+              <LogoutButton>
+                <span
+                  aria-label="ログアウト"
+                  className="p-2 hover:bg-gray-100 rounded-md inline-flex"
+                >
+                  <LogOut className="h-4 w-4" />
+                </span>
+              </LogoutButton>
+            )}
+          </div>
         </div>
       </aside>
 
@@ -136,7 +171,18 @@ export default function AdminShellClient({
 
         <div className="mt-auto pt-4 border-t border-gray-200 w-full flex items-center justify-between">
           <span className="text-xs text-gray-500">利用者情報</span>
-          <UserButton />
+
+          <div className="ml-auto flex items-center gap-3">
+            <UserButton />
+            <LogoutButton>
+              <span
+                aria-label="ログアウト"
+                className="p-2 hover:bg-gray-100 rounded-md inline-flex"
+              >
+                <LogOut className="h-4 w-4" />
+              </span>
+            </LogoutButton>
+          </div>
         </div>
       </aside>
 
