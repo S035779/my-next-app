@@ -10,6 +10,12 @@ export type ActionEffect =
 
 export type ActionResult = { state: UserFormState; effect: ActionEffect };
 
+export type UsersRoutes = {
+  usersIndex: string;
+  userDetail: (id: number) => string;
+  userNew: string;
+};
+
 export type Deps = {
   requireAdmin: () => Promise<void>;
   createUser: (email: string, name: string | null) => Promise<number>;
@@ -19,6 +25,7 @@ export type Deps = {
     name: string | null,
   ) => Promise<boolean>;
   deleteUser: (id: number) => Promise<boolean>;
+  routes: UsersRoutes;
 };
 
 export async function createUserCore(
@@ -42,7 +49,7 @@ export async function createUserCore(
 
     return {
       state: {},
-      effect: { kind: 'redirect', to: `/admin/users/${id}` },
+      effect: { kind: 'redirect', to: deps.routes.userDetail(id) },
     };
   } catch (err: unknown) {
     if (isDuplicateEmailError(err)) {
@@ -86,7 +93,7 @@ export async function updateUserCore(
 
     return {
       state: {},
-      effect: { kind: 'redirect', to: `/admin/users/${id}` },
+      effect: { kind: 'redirect', to: deps.routes.userDetail(id) },
     };
   } catch (err: unknown) {
     if (isDuplicateEmailError(err)) {
@@ -117,5 +124,5 @@ export async function deleteUserCore(
   const ok = await deps.deleteUser(id);
   if (!ok) return { effect: { kind: 'notFound' } };
 
-  return { effect: { kind: 'redirect', to: '/admin/users' } };
+  return { effect: { kind: 'redirect', to: deps.routes.usersIndex } };
 }

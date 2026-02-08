@@ -1,10 +1,29 @@
 export type MySqlErrorLike = {
-  code?: string;
-  errno?: number;
-  sqlState?: string;
-  message?: string;
+  code?: unknown;
+  errno?: unknown;
+  sqlState?: unknown;
+  message?: unknown;
   cause?: unknown;
 };
+
+/**
+ * オブジェクト判定
+ * @param v
+ * @returns
+ */
+function isObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null;
+}
+
+/**
+ * MySqlエラーを確認し、MySqlErrorLike型として返却する
+ * @param v 多重ラップ化されたエラー
+ * @returns
+ */
+function asMySqlErrorLike(v: unknown): MySqlErrorLike | null {
+  if (!isObject(v)) return null;
+  return v as MySqlErrorLike;
+}
 
 /**
  * 多重ラップされたエラーから重複エントリエラーを探す
@@ -16,15 +35,14 @@ export function findDuplicateEntryError(err: unknown): MySqlErrorLike | null {
 
   // 多重ラップに備えて最大 5 回たどる
   for (let i = 0; i < 5; i++) {
-    if (typeof cur !== 'object' || cur === null) return null;
+    const e = asMySqlErrorLike(cur);
+    if (!e) return null;
 
-    const e = cur as MySqlErrorLike;
+    const code = typeof e.code === 'string' ? e.code : undefined;
+    const errno = typeof e.errno === 'number' ? e.errno : undefined;
 
-    if (
-      e.code === 'ER_DUP_ENTRY' ||
-      e.errno === 1062 ||
-      e.sqlState === '23000'
-    ) {
+    // Duplicate entry だけに限定
+    if (code === 'ER_DUP_ENTRY' || errno === 1062) {
       return e;
     }
 

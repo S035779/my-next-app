@@ -19,6 +19,11 @@ describe('createUserCore', () => {
         (id: number, email: string, name: string | null) => Promise<boolean>
       >(async () => true),
       deleteUser: vi.fn<(id: number) => Promise<boolean>>(async () => true),
+      routes: {
+        usersIndex: '/admin/users',
+        userDetail: (id) => `/admin/users/${id}`,
+        userNew: '/admin/users/new',
+      },
     };
 
     const res = await createUserCore(
@@ -29,7 +34,7 @@ describe('createUserCore', () => {
 
     expect(res.effect.kind).toBe('redirect');
     if (res.effect.kind === 'redirect') {
-      expect(res.effect.to).toBe('/users/10');
+      expect(res.effect.to).toBe(deps.routes.userDetail(10));
     }
     expect(deps.createUser).toHaveBeenCalledWith('a@a.com', 'A');
   });
@@ -44,6 +49,11 @@ describe('createUserCore', () => {
           (id: number, email: string, name: string | null) => Promise<boolean>
         >(),
       deleteUser: vi.fn<(id: number) => Promise<boolean>>(),
+      routes: {
+        usersIndex: '/admin/users',
+        userDetail: (id) => `/admin/users/${id}`,
+        userNew: '/admin/users/new',
+      },
     };
     const res = await createUserCore(deps, {}, fd({ email: '' }));
     expect(res.effect.kind).toBe('none');
@@ -63,6 +73,11 @@ describe('createUserCore', () => {
           (id: number, email: string, name: string | null) => Promise<boolean>
         >(),
       deleteUser: vi.fn<(id: number) => Promise<boolean>>(),
+      routes: {
+        usersIndex: '/admin/users',
+        userDetail: (id) => `/admin/users/${id}`,
+        userNew: '/admin/users/new',
+      },
     };
 
     await expect(
