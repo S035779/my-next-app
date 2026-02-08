@@ -7,7 +7,6 @@ import { listUsers } from '../../../db/users.repo.next';
  */
 export default async function UsersPage() {
   const rows = await listUsers(50);
-
   return (
     <>
       <div
@@ -18,13 +17,13 @@ export default async function UsersPage() {
         }}
       >
         <h1 style={{ margin: 0 }}>ユーザー一覧</h1>
-        <Link href="/users/new">+ 新規作成</Link>
+        <Link href="/admin/users/new">+ 新規作成</Link>
       </div>
 
       <ul>
         {rows.map((u) => (
           <li key={u.id}>
-            <Link href={`/users/${u.id}`}>{u.email}</Link>
+            <Link href={`/admin/users/${u.id}`}>{u.email}</Link>
             {u.name ? ` (${u.name})` : ''}
           </li>
         ))}

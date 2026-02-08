@@ -7,13 +7,13 @@ import UserCreateForm from './UserCreateForm';
  */
 export default function NewUserPage() {
   return (
-    <main style={{ padding: 16 }}>
+    <div className="px-6 py-4">
       <p>
-        <Link href="/users">← ユーザー一覧に戻る</Link>
+        <Link href="/admin/users">← ユーザー一覧に戻る</Link>
       </p>
 
       <h1>Create User</h1>
       <UserCreateForm />
-    </main>
+    </div>
   );
 }

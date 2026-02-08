@@ -1,3 +1,7 @@
+/**
+ * 管理者ホームページ
+ * @returns JSX.Element
+ */
 export default function AdminHomePage() {
   return (
     <main className="p-6">

@@ -42,7 +42,7 @@ export async function createUserCore(
 
     return {
       state: {},
-      effect: { kind: 'redirect', to: `/users/${id}` },
+      effect: { kind: 'redirect', to: `/admin/users/${id}` },
     };
   } catch (err: unknown) {
     if (isDuplicateEmailError(err)) {
@@ -86,7 +86,7 @@ export async function updateUserCore(
 
     return {
       state: {},
-      effect: { kind: 'redirect', to: `/users/${id}` },
+      effect: { kind: 'redirect', to: `/admin/users/${id}` },
     };
   } catch (err: unknown) {
     if (isDuplicateEmailError(err)) {
@@ -117,5 +117,5 @@ export async function deleteUserCore(
   const ok = await deps.deleteUser(id);
   if (!ok) return { effect: { kind: 'notFound' } };
 
-  return { effect: { kind: 'redirect', to: '/users' } };
+  return { effect: { kind: 'redirect', to: '/admin/users' } };
 }
