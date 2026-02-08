@@ -7,6 +7,14 @@ import { requireAdmin } from '../../lib/auth/requireAdmin';
 import type { UserFormState } from './types';
 import { createUserCore, updateUserCore, deleteUserCore } from './core';
 import type { ActionEffect } from './core';
+import { adminUsersRoutes } from '../../lib/routes/adminUsers';
+import { logServerError } from '../../lib/server/logServerError';
+import { isDuplicateEmailError } from '@/src/lib/db-errors';
+import { parseIdOrThrow } from './validation';
+import { isNextControlFlowError } from '../../lib/server/nextControlFlow';
+
+const GENERIC_SAVE_ERROR =
+  '保存に失敗しました。時間をおいて再度お試しください。';
 
 function applyEffect(effect: ActionEffect) {
   switch (effect.kind) {
@@ -36,13 +44,31 @@ export async function createUserAction(
   prev: UserFormState,
   formData: FormData,
 ): Promise<UserFormState> {
-  const { state, effect } = await createUserCore(
-    { requireAdmin, createUser, updateUser, deleteUser },
-    prev,
-    formData,
-  );
-  applyEffect(effect);
-  return state;
+  try {
+    const { state, effect } = await createUserCore(
+      {
+        requireAdmin,
+        createUser,
+        updateUser,
+        deleteUser,
+        routes: adminUsersRoutes,
+      },
+      prev,
+      formData,
+    );
+    applyEffect(effect);
+    return state;
+  } catch (err: unknown) {
+    if (isNextControlFlowError(err)) throw err;
+
+    if (isDuplicateEmailError(err)) {
+      return { fieldErrors: { email: 'このメールアドレスは既に使用されています' } };
+    }
+
+    logServerError({ scope: 'users.create' }, err);
+
+    return { message: GENERIC_SAVE_ERROR };
+  }
 }
 
 /**
@@ -55,13 +81,31 @@ export async function updateUserAction(
   prev: UserFormState,
   formData: FormData,
 ): Promise<UserFormState> {
-  const { state, effect } = await updateUserCore(
-    { requireAdmin, createUser, updateUser, deleteUser },
-    prev,
-    formData,
-  );
-  applyEffect(effect);
-  return state;
+  try {
+    const { state, effect } = await updateUserCore(
+      {
+        requireAdmin,
+        createUser,
+        updateUser,
+        deleteUser,
+        routes: adminUsersRoutes,
+      },
+      prev,
+      formData,
+    );
+    applyEffect(effect);
+    return state;
+  } catch (err: unknown) {
+    if (isNextControlFlowError(err)) throw err;
+
+    if (isDuplicateEmailError(err)) {
+      return { fieldErrors: { email: 'このメールアドレスは既に使用されています' } };
+    }
+
+    logServerError({ scope: 'users.update' }, err);
+
+    return { message: GENERIC_SAVE_ERROR };
+  }
 }
 
 /**
@@ -70,9 +114,17 @@ export async function updateUserAction(
  * @returns void
  */
 export async function deleteUserAction(formData: FormData) {
-  const { effect } = await deleteUserCore(
-    { requireAdmin, createUser, updateUser, deleteUser },
-    formData,
-  );
-  applyEffect(effect);
+  await requireAdmin();
+  try {
+    const id = parseIdOrThrow(formData);
+    const ok = await deleteUser(id);
+    if (!ok) notFound();
+
+    revalidatePath('/admin/users');
+    redirect('/admin/users');
+  } catch (err: unknown) {
+    if (isNextControlFlowError(err)) throw err;
+    logServerError({ scope: 'users.delete' }, err);
+    throw err;
+  }
 }
