@@ -36,6 +36,7 @@ jobs:
 
       # test DB URL (CI)
       DATABASE_URL_TEST: ${{ secrets.DATABASE_URL_TEST }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
 
       # seed が admin 候補を作るなら（必要な場合のみ）
       ADMIN_EMAILS: ${{ secrets.ADMIN_EMAILS }}
