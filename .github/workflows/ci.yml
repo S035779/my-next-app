@@ -66,10 +66,12 @@ jobs:
         run: pnpm test
 
       - name: Prepare DB for E2E
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
         run: |
-          DATABASE_URL=$DATABASE_URL_TEST tsx src/db/reset.ts
-          DATABASE_URL=$DATABASE_URL_TEST drizzle-kit migrate
-          DATABASE_URL=$DATABASE_URL_TEST tsx src/db/seed.ts
+          pnpm exec tsx src/db/reset.ts
+          pnpm exec drizzle-kit migrate
+          pnpm exec tsx src/db/seed.ts
 
       - name: E2E tests
         run: pnpm exec playwright test
