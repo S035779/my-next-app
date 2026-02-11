@@ -9,7 +9,13 @@ export default defineConfig({
   testIgnore: ['**/src/**', '**/node_modules/**'],
   use: {
     baseURL: 'http://localhost:3000',
+    trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: process.env.CI ? 'retain-on-failure' : 'off',
   },
+  reporter: process.env.CI
+  ? [['html', { open: 'never' }], ['list']]
+  : [['html', { open: 'on-failure' }], ['list']],
   webServer: {
     command: 'pnpm dev',
     url: 'http://localhost:3000',
