@@ -7,12 +7,10 @@ import UserCreateForm from './UserCreateForm';
  */
 export default function NewUserPage() {
   return (
-    <div className="px-6 py-4">
-      <p>
-        <Link href="/admin/users">← ユーザー一覧に戻る</Link>
-      </p>
-
-      <h1>Create User</h1>
+    <div className="px-6 py-4" data-testid="admin-user-new-page">
+      <h1 data-testid="page-title" className="text-lg font-bold">
+        ユーザー作成
+      </h1>
       <UserCreateForm />
     </div>
   );

@@ -21,7 +21,10 @@
     "db:reset:test": "dotenv -e .env.local -- sh -c 'DB_URL=$DATABASE_URL_TEST tsx src/db/reset.ts' && pnpm db:migrate:test && pnpm db:seed:test",
     "test": "pnpm test:db && vitest run",
     "test:watch": "pnpm test:db && vitest",
-    "test:db": "dotenv -e .env.local -- sh -c 'DB_URL=$DATABASE_URL_TEST tsx src/db/reset.ts && DATABASE_URL=$DATABASE_URL_TEST drizzle-kit migrate && tsx src/db/seed.ts'"
+    "test:db": "dotenv -e .env.local -- sh -c 'DB_URL=$DATABASE_URL_TEST tsx src/db/reset.ts && DATABASE_URL=$DATABASE_URL_TEST drizzle-kit migrate && tsx src/db/seed.ts'",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.36.10",

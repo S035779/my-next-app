@@ -6,14 +6,11 @@ import Link from 'next/link';
  */
 export default function NotFound() {
   return (
-    <main style={{ padding: 16 }}>
-      <h1>User not found</h1>
-      <p>
+    <div data-testid="not-found">
+      <h1 data-testid="not-found-title">Not Found</h1>
+      <p data-testid="not-found-message">
         指定されたユーザーは存在しません（削除済み、またはURLのIDが不正です）。
       </p>
-      <p>
-        <Link href="/admin/users">← ユーザー一覧に戻る</Link>
-      </p>
-    </main>
+    </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { createUserAction } from '../../../../actions/users';
 import { useFormStatus } from 'react-dom';
+
 /**
  * 送信ボタンコンポーネント
  * @returns JSX.Element
@@ -10,8 +11,8 @@ import { useFormStatus } from 'react-dom';
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" disabled={pending}>
-      {pending ? 'Creating...' : 'Create'}
+    <button data-testid="user-submit" type="submit" disabled={pending}>
+      {pending ? '追加中...' : '追加'}
     </button>
   );
 }
@@ -23,23 +24,31 @@ function SubmitButton() {
 export default function UserCreateForm() {
   const [state, formAction] = useActionState(createUserAction, {});
 
+  const emailErrorId = state.fieldErrors?.email
+    ? 'create-email-error'
+    : undefined;
+
   return (
-    <form action={formAction}>
+    <form action={formAction} data-testid="user-form">
       <div>
         <label>
           Email:
           <input
+            data-testid="user-email"
             name="email"
             type="email"
             required
             aria-invalid={!!state.fieldErrors?.email}
-            aria-describedby={
-              state.fieldErrors?.email ? 'email-error' : undefined
-            }
+            aria-describedby={emailErrorId}
           />
         </label>
         {state.fieldErrors?.email && (
-          <p id="email-error" style={{ color: 'crimson' }}>
+          <p
+            id="create-email-error"
+            data-testid="error-email"
+            data-error-code="DUPLICATE_EMAIL"
+            style={{ color: 'crimson' }}
+          >
             {state.fieldErrors.email}
           </p>
         )}
@@ -48,14 +57,20 @@ export default function UserCreateForm() {
       <div>
         <label>
           Name:
-          <input name="name" />
+          <input data-testid="user-name" name="name" />
         </label>
         {state.fieldErrors?.name && (
-          <p style={{ color: 'crimson' }}>{state.fieldErrors.name}</p>
+          <p style={{ color: 'crimson' }} data-testid="error-name">
+            {state.fieldErrors.name}
+          </p>
         )}
       </div>
 
-      {state.message && <p style={{ color: 'crimson' }}>{state.message}</p>}
+      {state.message && (
+        <p style={{ color: 'crimson' }} data-testid="error-form">
+          {state.message}
+        </p>
+      )}
 
       <SubmitButton />
     </form>

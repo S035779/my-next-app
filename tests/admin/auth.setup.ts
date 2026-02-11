@@ -33,7 +33,6 @@ setup('admin auth', async ({ page }) => {
     .first()
     .click();
 
-  // sign-in を抜けることを確認（factor-two に行かない）
   await expect(page).not.toHaveURL(/\/sign-in/);
 
   // 管理画面
