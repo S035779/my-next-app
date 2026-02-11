@@ -60,13 +60,17 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+        run: pnpm exec playwright install --with-deps chromium
 
-      # vitest + DB reset/migrate/seed（あなたの package.json にある test がこれをやる想定）
       - name: Unit/Integration tests
         run: pnpm test
 
-      # E2E（playwright.config.ts の webServer が pnpm dev を起動する想定）
+      - name: Prepare DB for E2E
+        run: |
+          DATABASE_URL=$DATABASE_URL_TEST tsx src/db/reset.ts
+          DATABASE_URL=$DATABASE_URL_TEST drizzle-kit migrate
+          DATABASE_URL=$DATABASE_URL_TEST tsx src/db/seed.ts
+
       - name: E2E tests
         run: pnpm exec playwright test
 
