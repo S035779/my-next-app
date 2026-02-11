@@ -5,8 +5,20 @@ FROM mcr.microsoft.com/devcontainers/javascript-node:22-bookworm
 # redis-tools: redis-cli コマンド
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-     default-mysql-client \
-     redis-tools \
+    libnspr4 \
+    libnss3 \
+    libatk1.0-0 \
+    libdbus-1-3 \
+    libatspi2.0-0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libxkbcommon0 \
+    libasound2 \
+    default-mysql-client \
+    redis-tools \
   && rm -rf /var/lib/apt/lists/*
 
 # Corepack は sudo 不要で確実にしておきたいので、ここで有効化・pnpm固定まで実施

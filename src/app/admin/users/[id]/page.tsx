@@ -20,23 +20,20 @@ export default async function UserEditPage({ params }: Props) {
   if (!user) notFound();
 
   return (
-    <div className="px-6 py-4">
-      <p>
-        <Link href="/admin/users">← Back</Link>
-      </p>
-
-      <h1>Edit User</h1>
-
-      {/* update */}
+    <div className="px-6 py-4" data-testid="admin-user-edit-page">
+      <h1 data-testid="page-title" className="text-lg font-bold">
+        ユーザー編集
+      </h1>
       <UserEditForm id={user.id} email={user.email} name={user.name ?? null} />
-
       <hr style={{ margin: '16px 0' }} />
-
-      {/* delete */}
-      <form action={deleteUserAction}>
+      <form action={deleteUserAction} data-testid="user-delete-form">
         <input type="hidden" name="id" value={String(user.id)} />
-        <button type="submit" style={{ color: 'red' }}>
-          Delete
+        <button
+          data-testid="user-delete"
+          type="submit"
+          style={{ color: 'red' }}
+        >
+          削除
         </button>
       </form>
     </div>

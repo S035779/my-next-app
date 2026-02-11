@@ -10,20 +10,30 @@ export default async function UsersPage() {
   return (
     <>
       <div
+        data-testid="admin-users-page"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
         }}
       >
-        <h1 style={{ margin: 0 }}>ユーザー一覧</h1>
-        <Link href="/admin/users/new">+ 新規作成</Link>
+        <h1 data-testid="page-title" className="text-lg font-bold">
+          ユーザー管理
+        </h1>
+        <Link href="/admin/users/new" data-testid="user-new-link">
+          + 新規作成
+        </Link>
       </div>
 
-      <ul>
+      <ul data-testid="users-list">
         {rows.map((u) => (
-          <li key={u.id}>
-            <Link href={`/admin/users/${u.id}`}>{u.email}</Link>
+          <li key={u.id} data-testid={`user-row-${u.id}`}>
+            <Link
+              href={`/admin/users/${u.id}`}
+              data-testid={`user-link-${u.id}`}
+            >
+              {u.email}
+            </Link>
             {u.name ? ` (${u.name})` : ''}
           </li>
         ))}
