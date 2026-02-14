@@ -9,7 +9,7 @@ test.describe('admin users CRUD (fully testid based)', () => {
     page,
   }) => {
     await page.goto('/admin/users');
-    await expect(page).toHaveURL(/\/admin\/users/);
+    await expect(page.getByTestId('page-title')).toHaveText('ユーザー管理');
 
     // =========================================================
     // 1) 作成

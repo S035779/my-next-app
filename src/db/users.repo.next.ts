@@ -4,6 +4,7 @@ import { usersRepo } from './users.repo';
 
 export const {
   listUsers,
+  listUsersPage,
   findUserById,
   findUserIdByEmail,
   createUser,
