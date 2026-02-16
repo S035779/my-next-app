@@ -14,8 +14,8 @@ export default defineConfig({
     video: process.env.CI ? 'retain-on-failure' : 'off',
   },
   reporter: process.env.CI
-  ? [['html', { open: 'never' }], ['list']]
-  : [['html', { open: 'on-failure' }], ['list']],
+    ? [['html', { open: 'never' }], ['list']]
+    : [['html', { open: 'on-failure' }], ['list']],
   webServer: {
     command: 'pnpm dev',
     url: 'http://localhost:3000',

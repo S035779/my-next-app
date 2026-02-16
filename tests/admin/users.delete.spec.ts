@@ -15,7 +15,7 @@ async function createUserViaUI(
   await page.getByTestId('user-name').fill('To Delete');
   await page.getByTestId('user-submit').click();
 
-  await expect(page).toHaveURL(/\/admin\/users\/\d+\/?$/);
+  await expect(page).toHaveURL(/\/admin\/users\/\d+\/?(?:\?.*)?$/);
 }
 
 test('admin: delete -> removed from list -> edit page becomes 404', async ({
@@ -34,7 +34,7 @@ test('admin: delete -> removed from list -> edit page becomes 404', async ({
   await page.getByTestId('user-delete').click();
 
   // 3) 一覧に戻る
-  await expect(page).toHaveURL(/\/admin\/users\/?$/);
+  await expect(page).toHaveURL(/\/admin\/users\/?(?:\?.*)?$/);
 
   // 4) 一覧から消えている
   await expect(page.getByRole('link', { name: email })).toHaveCount(0);

@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 /**
  * ユーザー未発見ページ
  * @returns ユーザー未発見ページコンポーネント

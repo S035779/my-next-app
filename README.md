@@ -160,8 +160,14 @@ pnpm exec playwright test
 特定のE2Eテストを実行するには、以下のコマンドを使用します:
 
 ```bash
-pnpm exec playwright test tests/admin/users.crud.spec.ts --project=chromium
-pnpm exec playwright test tests/admin/users.pagination.spec.ts --project=chromium --headed
+pnpm exec playwright test tests/admin/users.crud.spec.ts
+pnpm exec playwright test tests/admin/users.pagination.spec.ts
+```
+
+レポートを参照するには、以下のコマンドを使用します:
+
+```bash
+pnpm exec playwright show-report --host 0.0.0.0
 ```
 
 ## Learn More

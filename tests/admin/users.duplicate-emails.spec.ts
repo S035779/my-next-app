@@ -19,7 +19,7 @@ test('admin: duplicate email shows validation error (unique constraint)', async 
   await page.getByTestId('user-submit').click();
 
   // 成功すると編集ページへ redirect される想定
-  await expect(page).toHaveURL(/\/admin\/users\/\d+\/?$/);
+  await expect(page).toHaveURL(/\/admin\/users\/\d+\/?(?:\?.*)?$/);
 
   // 2回目: 同じメールで作成（失敗してフォームに留まる）
   await page.goto('/admin/users/new');

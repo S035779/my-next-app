@@ -1,7 +1,7 @@
 // src/lib/server/logServerError.ts
 type LogContext = {
-  scope: string;            // e.g. 'users.create'
-  userId?: string | null;   // 任意（今回なくてもOK）
+  scope: string; // e.g. 'users.create'
+  userId?: string | null; // 任意（今回なくてもOK）
 };
 
 function safeMessage(err: unknown): string {

@@ -18,7 +18,7 @@ async function createUserViaUI(
   await page.getByTestId('user-submit').click();
 
   // 成功すると編集ページへ
-  await expect(page).toHaveURL(/\/admin\/users\/\d+\/?$/);
+  await expect(page).toHaveURL(/\/admin\/users\/\d+\/?(?:\?.*)?$/);
 }
 
 test('admin: update email to existing one shows duplicate error (unique constraint)', async ({

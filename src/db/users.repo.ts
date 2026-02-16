@@ -1,5 +1,5 @@
 import { users } from './schema';
-import { count, desc, eq } from 'drizzle-orm';
+import { or, like, count, desc, eq } from 'drizzle-orm';
 import type { AppDb } from './types';
 
 export type Paged<T> = {
@@ -8,7 +8,23 @@ export type Paged<T> = {
   page: number;
   perPage: number;
   totalPages: number;
+  q?: string;
 };
+
+function normalizePage(page: number): number {
+  return Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+}
+
+function normalizePerPage(perPage: number): number {
+  const n = Number.isFinite(perPage) && perPage > 0 ? Math.floor(perPage) : 20;
+  // 暴走防止：上限
+  return Math.min(Math.max(n, 1), 100);
+}
+
+function normalizeQ(q?: string): string | undefined {
+  const v = (q ?? '').trim();
+  return v.length > 0 ? v : undefined;
+}
 
 export function usersRepo(db: AppDb) {
   /**
@@ -39,28 +55,48 @@ export function usersRepo(db: AppDb) {
    * ユーザー一覧を取得（ページネーション）
    * @param limit 取得上限件数
    * @param perPage ページ行数
+   * @param q? クエリ
    * @returns ユーザー配列
    */
   const listUsersPage = async (
     page: number,
     perPage: number,
+    q?: string,
   ): Promise<Paged<{ id: number; email: string; name: string | null }>> => {
-    const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
-    const limit = perPage;
-    const offset = (safePage - 1) * perPage;
+    const safePage = normalizePage(page);
+    const safePerPage = normalizePerPage(perPage);
+    const safeQ = normalizeQ(q);
+
+    const offset = (safePage - 1) * safePerPage;
+
+    const whereExpr = safeQ
+      ? or(like(users.email, `%${safeQ}%`), like(users.name, `%${safeQ}%`))
+      : undefined;
 
     const rows = await db
       .select({ id: users.id, email: users.email, name: users.name })
       .from(users)
+      .where(whereExpr)
       .orderBy(desc(users.id))
-      .limit(limit)
+      .limit(safePerPage)
       .offset(offset);
 
-    const [{ total }] = await db.select({ total: count() }).from(users);
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(users)
+      .where(whereExpr);
 
-    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    const totalPages = Math.max(1, Math.ceil(total / safePerPage));
+    const clampedPage = Math.min(safePage, totalPages);
 
-    return { rows, total, page: safePage, perPage, totalPages };
+    return {
+      rows,
+      total,
+      page: clampedPage,
+      perPage: safePerPage,
+      totalPages,
+      q: safeQ,
+    };
   };
 
   /**

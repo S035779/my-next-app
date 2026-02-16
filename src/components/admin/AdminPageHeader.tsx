@@ -2,16 +2,27 @@ import Link from 'next/link';
 
 export type Breadcrumb = {
   label: string;
-  href?: string; // 現在地は href を省略
+  href?: string;
 };
 
+/**
+ * 管理画面ヘッダー
+ * @param title 画面タイトル
+ * @param titleTestId テストID
+ * @param breadcrumbs パンくず配列
+ * @param description 画面説明
+ * @param right ページリンク要素
+ * @returns
+ */
 export default function AdminPageHeader({
   title,
+  titleTestId,
   breadcrumbs,
   description,
   right,
 }: {
   title: string;
+  titleTestId?: string;
   breadcrumbs?: Breadcrumb[];
   description?: string;
   right?: React.ReactNode;
@@ -50,7 +61,12 @@ export default function AdminPageHeader({
 
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
+          <h1
+            data-testid={titleTestId}
+            className="text-xl font-semibold text-gray-900"
+          >
+            {title}
+          </h1>
           {description && (
             <p className="mt-1 text-sm text-gray-600">{description}</p>
           )}

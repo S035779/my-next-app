@@ -2,77 +2,78 @@
 
 import { useActionState } from 'react';
 import { createUserAction } from '../../../../actions/users';
-import { useFormStatus } from 'react-dom';
-
-/**
- * 送信ボタンコンポーネント
- * @returns JSX.Element
- */
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <button data-testid="user-submit" type="submit" disabled={pending}>
-      {pending ? '追加中...' : '追加'}
-    </button>
-  );
-}
+import AdminFormField from '../../../../components/admin/AdminFormField';
+import AdminTextInput from '../../../../components/admin/AdminTextInput';
+import AdminPrimaryButton from '../../../../components/admin/AdminPrimaryButton';
+import AdminErrorSummary from '../../../../components/admin/AdminErrorSummary';
+import AdminFormActions from '../../../../components/admin/AdminFormActions';
 
 /**
  * ユーザー作成フォームコンポーネント
+ * @param from 元URL
  * @returns JSX.Element
  */
-export default function UserCreateForm() {
+export default function UserCreateForm({ from }: { from?: string }) {
   const [state, formAction] = useActionState(createUserAction, {});
+  const cancelHref = from && from.trim() ? from : '/admin/users?page=1';
 
-  const emailErrorId = state.fieldErrors?.email
-    ? 'create-email-error'
-    : undefined;
+  const emailHasError = !!state.fieldErrors?.email;
 
   return (
-    <form action={formAction} data-testid="user-form">
-      <div>
-        <label>
-          Email:
-          <input
-            data-testid="user-email"
-            name="email"
-            type="email"
-            required
-            aria-invalid={!!state.fieldErrors?.email}
-            aria-describedby={emailErrorId}
-          />
-        </label>
-        {state.fieldErrors?.email && (
-          <p
-            id="create-email-error"
-            data-testid="error-email"
-            data-error-code="DUPLICATE_EMAIL"
-            style={{ color: 'crimson' }}
-          >
-            {state.fieldErrors.email}
-          </p>
-        )}
-      </div>
+    <form
+      action={formAction}
+      data-testid="user-form"
+      className="space-y-4"
+      noValidate
+    >
+      <input type="hidden" name="from" value={from ?? ''} />
 
-      <div>
-        <label>
-          Name:
-          <input data-testid="user-name" name="name" />
-        </label>
-        {state.fieldErrors?.name && (
-          <p style={{ color: 'crimson' }} data-testid="error-name">
-            {state.fieldErrors.name}
-          </p>
-        )}
-      </div>
+      <AdminErrorSummary
+        message={state.message}
+        fieldErrors={state.fieldErrors}
+        fieldIdMap={{ email: 'email', name: 'name' }}
+      />
 
-      {state.message && (
-        <p style={{ color: 'crimson' }} data-testid="error-form">
-          {state.message}
-        </p>
-      )}
+      <AdminFormField
+        label="Email"
+        htmlFor="email"
+        required
+        description="ログインIDとして使用します。あとから変更できます。"
+        error={state.fieldErrors?.email}
+        errorTestId={state.fieldErrors?.email ? 'error-email' : undefined}
+        errorCode={state.fieldErrors?.email ? 'DUPLICATE_EMAIL' : undefined}
+      >
+        <AdminTextInput
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+          data-testid="user-email"
+          aria-invalid={emailHasError}
+        />
+      </AdminFormField>
 
-      <SubmitButton />
+      <AdminFormField
+        label="Name"
+        htmlFor="name"
+        description="表示名（任意）"
+        error={state.fieldErrors?.name}
+      >
+        <AdminTextInput
+          name="name"
+          autoComplete="name"
+          data-testid="user-name"
+          aria-invalid={!!state.fieldErrors?.name}
+        />
+      </AdminFormField>
+
+      <AdminFormActions cancelHref={cancelHref}>
+        <AdminPrimaryButton
+          label="追加"
+          pendingLabel="追加中..."
+          testId="user-submit"
+        />
+      </AdminFormActions>
     </form>
   );
 }

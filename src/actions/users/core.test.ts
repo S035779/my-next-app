@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createUserCore } from './core';
 import type { Deps } from './core';
+import { adminUsersRoutes } from '../../lib/routes/adminUsers';
 
 function fd(obj: Record<string, string>) {
   const f = new FormData();
@@ -19,11 +20,7 @@ describe('createUserCore', () => {
         (id: number, email: string, name: string | null) => Promise<boolean>
       >(async () => true),
       deleteUser: vi.fn<(id: number) => Promise<boolean>>(async () => true),
-      routes: {
-        usersIndex: '/admin/users',
-        userDetail: (id) => `/admin/users/${id}`,
-        userNew: '/admin/users/new',
-      },
+      routes: adminUsersRoutes,
     };
 
     const res = await createUserCore(
@@ -34,7 +31,9 @@ describe('createUserCore', () => {
 
     expect(res.effect.kind).toBe('redirect');
     if (res.effect.kind === 'redirect') {
-      expect(res.effect.to).toBe(deps.routes.userDetail(10));
+      expect(res.effect.to).toBe(
+        deps.routes.detail(10, { from: deps.routes.index({ page: 1 }) }),
+      );
     }
     expect(deps.createUser).toHaveBeenCalledWith('a@a.com', 'A');
   });
@@ -49,11 +48,7 @@ describe('createUserCore', () => {
           (id: number, email: string, name: string | null) => Promise<boolean>
         >(),
       deleteUser: vi.fn<(id: number) => Promise<boolean>>(),
-      routes: {
-        usersIndex: '/admin/users',
-        userDetail: (id) => `/admin/users/${id}`,
-        userNew: '/admin/users/new',
-      },
+      routes: adminUsersRoutes,
     };
     const res = await createUserCore(deps, {}, fd({ email: '' }));
     expect(res.effect.kind).toBe('none');
@@ -73,11 +68,7 @@ describe('createUserCore', () => {
           (id: number, email: string, name: string | null) => Promise<boolean>
         >(),
       deleteUser: vi.fn<(id: number) => Promise<boolean>>(),
-      routes: {
-        usersIndex: '/admin/users',
-        userDetail: (id) => `/admin/users/${id}`,
-        userNew: '/admin/users/new',
-      },
+      routes: adminUsersRoutes,
     };
 
     await expect(
