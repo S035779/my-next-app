@@ -1,0 +1,74 @@
+import { z } from "zod";
+import { mapDbErrorToAppError } from "@/lib/db-errors";
+import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { <repoName> } from "@/db/<resource>.repo";
+import { <CreateInput>, <UpdateInput>, <AppError>, <Resource> } from "./types";
+import { createSchema, updateSchema, idSchema } from "./validation";
+
+export async function list<ResourcePlural>(): Promise<<Resource>[]> {
+  try {
+    return await <repoName>.list();
+  } catch (e) {
+    throw mapDbErrorToAppError(e);
+  }
+}
+
+export async function get<Resource>ById(id: string): Promise<<Resource>> {
+  const parsed = idSchema.safeParse({ id });
+  if (!parsed.success) throw <AppError>.validation(parsed.error);
+
+  try {
+    const row = await <repoName>.findById(id);
+    if (!row) throw <AppError>.notFound("<resource>");
+    return row;
+  } catch (e) {
+    throw mapDbErrorToAppError(e);
+  }
+}
+
+export async function create<Resource>(input: <CreateInput>): Promise<<Resource>> {
+  // 認可が必要な場合のみ（Admin用途なら必須）
+  await requireAdmin();
+
+  const parsed = createSchema.safeParse(input);
+  if (!parsed.success) throw <AppError>.validation(parsed.error);
+
+  try {
+    return await <repoName>.insert(parsed.data);
+  } catch (e) {
+    throw mapDbErrorToAppError(e);
+  }
+}
+
+export async function update<Resource>(id: string, input: <UpdateInput>): Promise<<Resource>> {
+  await requireAdmin();
+
+  const idParsed = idSchema.safeParse({ id });
+  if (!idParsed.success) throw <AppError>.validation(idParsed.error);
+
+  const parsed = updateSchema.safeParse(input);
+  if (!parsed.success) throw <AppError>.validation(parsed.error);
+
+  try {
+    const updated = await <repoName>.updateById(id, parsed.data);
+    if (!updated) throw <AppError>.notFound("<resource>");
+    return updated;
+  } catch (e) {
+    throw mapDbErrorToAppError(e);
+  }
+}
+
+export async function delete<Resource>(id: string): Promise<{ id: string }> {
+  await requireAdmin();
+
+  const parsed = idSchema.safeParse({ id });
+  if (!parsed.success) throw <AppError>.validation(parsed.error);
+
+  try {
+    const ok = await <repoName>.deleteById(id);
+    if (!ok) throw <AppError>.notFound("<resource>");
+    return { id };
+  } catch (e) {
+    throw mapDbErrorToAppError(e);
+  }
+}

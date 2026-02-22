@@ -1,0 +1,8 @@
+import { describe, it, expect } from "vitest";
+// import { ... } from "./index";
+
+describe("<resource> actions", () => {
+  it("TODO: add unit tests for validation and happy path", () => {
+    expect(true).toBe(true);
+  });
+});
