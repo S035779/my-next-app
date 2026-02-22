@@ -22,6 +22,10 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  // JSON specific settings
+   "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   // Auto save
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 1000,

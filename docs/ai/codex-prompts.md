@@ -1,5 +1,39 @@
 # Codex Prompts (Advanced)
 
+## 新機能実装
+
+docs/features/\<feature> を読み、
+AGENTS.md の規約に従って実装してください。
+
+---
+
+## DB変更
+
+docs/database を読み、
+schemaとrepoを更新してください。
+
+---
+
+## API生成
+
+docs/api を読み、
+route と validation を生成してください。
+
+---
+
+## UI生成
+
+docs/ui を読み、
+components と page を作成してください。
+
+---
+
+## テスト生成
+
+変更内容から必要なテストを生成してください。
+
+---
+
 ## 1) CRUDを丸ごと生成
 
 docs/features/\<resource>.md を正として読み、
