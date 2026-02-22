@@ -2,35 +2,49 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect, notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { createUser, deleteUser, updateUser } from '../../db/users.repo.next';
 import { requireAdmin } from '../../lib/auth/requireAdmin';
 import type { UserFormState } from './types';
-import { createUserCore, updateUserCore, deleteUserCore } from './core';
+import { createUserCore, deleteUserCore, updateUserCore } from './core';
 import type { ActionEffect } from './core';
 import { adminUsersRoutes } from '../../lib/routes/adminUsers';
 import { logServerError } from '../../lib/server/logServerError';
 import { isDuplicateEmailError } from '@/src/lib/db-errors';
-import { parseIdOrThrow } from './validation';
 import { isNextControlFlowError } from '../../lib/server/nextControlFlow';
+
+type ToastKind = 'created' | 'saved' | 'deleted';
 
 const GENERIC_SAVE_ERROR =
   '保存に失敗しました。時間をおいて再度お試しください。';
 
-function applyEffect(effect: ActionEffect) {
+async function setToast(kind: ToastKind) {
+  const c = await cookies();
+  c.set('toast', kind, { path: '/', maxAge: 5, sameSite: 'lax' });
+}
+
+async function applyEffect(effect: ActionEffect) {
   switch (effect.kind) {
     case 'revalidate':
       for (const p of effect.paths) revalidatePath(p);
       return;
+
     case 'redirect':
+      if ('toast' in effect && effect.toast) await setToast(effect.toast);
       redirect(effect.to);
+      return; // 念のため（到達しないが意図を明示）
+
     case 'notFound':
       notFound();
+      return;
+
     case 'none':
       return;
-    default:
-      // exhaustiveness check
+
+    default: {
       const _never: never = effect;
       return _never;
+    }
   }
 }
 
@@ -56,13 +70,15 @@ export async function createUserAction(
       prev,
       formData,
     );
-    applyEffect(effect);
+    await applyEffect(effect);
     return state;
   } catch (err: unknown) {
     if (isNextControlFlowError(err)) throw err;
 
     if (isDuplicateEmailError(err)) {
-      return { fieldErrors: { email: 'このメールアドレスは既に使用されています' } };
+      return {
+        fieldErrors: { email: 'このメールアドレスは既に使用されています' },
+      };
     }
 
     logServerError({ scope: 'users.create' }, err);
@@ -93,13 +109,15 @@ export async function updateUserAction(
       prev,
       formData,
     );
-    applyEffect(effect);
+    await applyEffect(effect);
     return state;
   } catch (err: unknown) {
     if (isNextControlFlowError(err)) throw err;
 
     if (isDuplicateEmailError(err)) {
-      return { fieldErrors: { email: 'このメールアドレスは既に使用されています' } };
+      return {
+        fieldErrors: { email: 'このメールアドレスは既に使用されています' },
+      };
     }
 
     logServerError({ scope: 'users.update' }, err);
@@ -114,14 +132,23 @@ export async function updateUserAction(
  * @returns void
  */
 export async function deleteUserAction(formData: FormData) {
-  await requireAdmin();
   try {
-    const id = parseIdOrThrow(formData);
-    const ok = await deleteUser(id);
-    if (!ok) notFound();
+    const { effect, revalidate: paths } = await deleteUserCore(
+      {
+        requireAdmin,
+        createUser,
+        updateUser,
+        deleteUser,
+        routes: adminUsersRoutes,
+      },
+      formData,
+    );
 
-    revalidatePath('/admin/users');
-    redirect('/admin/users');
+    if (paths) {
+      for (const p of paths) revalidatePath(p);
+    }
+
+    await applyEffect(effect);
   } catch (err: unknown) {
     if (isNextControlFlowError(err)) throw err;
     logServerError({ scope: 'users.delete' }, err);

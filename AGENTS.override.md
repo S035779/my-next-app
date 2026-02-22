@@ -1,4 +1,4 @@
-# chapger-two-student-app リポジトリ作業ルール（AGENTS.override.md）
+# リポジトリ作業ルール（AGENTS.override.md）
 
 これは Next.js + TypeScript プロジェクト（my-next-app）で、Codex（エージェント）が作業するためのルールです。
 
@@ -228,7 +228,7 @@ pnpm db:reset:test
 - ロジック追加・仕様変更がある場合は、原則として `src/actions/**` でユニットテストを追加/更新する。
   - 例：`src/actions/users/core.test.ts` のパターンを踏襲。
 - DBに依存する変更は、可能なら repoレイヤでテストし、アプリ層のテストはモック/スタブで分離する。
-- テスト実行は原則 `pnpm test`（内部で `test:db` → `vitest run`）。必要に応じて `pnpm test:watch`。  
+- テスト実行は原則 `pnpm test`（内部で `test:db` → `vitest run`）。必要に応じて `pnpm test:watch`。
 
 ### 変更時のチェックリスト（実装後）
 
@@ -398,6 +398,7 @@ API変更がある場合は以下を必ず含める:
 #### A-1. 新しいドメイン（例: products）を追加する場合
 
 配置:
+
 - `src/actions/<domain>/`
   - `core.ts`       : ユースケース本体（DB repo呼び出し、整形、例外変換）
   - `validation.ts` : 入力バリデーション（zod等。既存実装に合わせる）
@@ -406,17 +407,20 @@ API変更がある場合は以下を必ず含める:
   - `core.test.ts`  : ユースケースのユニットテスト（Vitest）
 
 ##### core.ts（例）
+
 - ルール:
   - 直接 `app/*` からDB repoを呼ばない。必ず actions 経由にする。
   - DB例外は `lib/db-errors.ts` 等の既存ユーティリティを使って変換/整形する。
   - 認可が絡む場合は `lib/auth/*` を利用する（例: requireAdmin）。
 
 ##### validation.ts（例）
+
 - ルール:
   - 入力はここで検証し、`core.ts` は検証済み入力を前提にする。
   - エラーメッセージはUI側で使える粒度にする（可能ならフィールド単位）。
 
 ##### index.ts（例）
+
 - ルール:
   - 外部公開関数は index.ts に集約し、core関数は直接exportしない（必要な場合のみ）。
   - 可能なら `create/update/delete/get/list` の命名で統一する。
@@ -428,12 +432,14 @@ API変更がある場合は以下を必ず含める:
 #### B-1. 新しい repo を追加する場合
 
 配置:
+
 - `src/db/<domain>.repo.ts`       : 本番実装
 - `src/db/<domain>.repo.test.ts`  : テスト用実装/補助（既存運用に合わせる）
 - `src/db/types.ts`               : DB用の型（必要な場合）
 - `src/db/schema.ts`              : schema更新（必要な場合）
 
 ルール:
+
 - repoは「DBのI/O」に責務を限定する（ビジネス判断はactionsへ）。
 - 返り値の型は明示し、UIが扱いやすい形に整形しすぎない（整形はactionsへ）。
 - クエリを増やすときは既存 `users.repo.ts` を参照し、同じスタイルで実装する。
@@ -445,9 +451,11 @@ API変更がある場合は以下を必ず含める:
 #### C-1. 新しいAPIエンドポイントを作る場合
 
 配置:
+
 - `src/app/api/<domain>/route.ts` または `src/app/api/<domain>/<action>/route.ts`
 
 ルール（必須）:
+
 1. 入力を受け取る（query/body）
 2. `actions/<domain>` の validation を通す
 3. `actions/<domain>` のユースケースを呼ぶ
@@ -456,6 +464,7 @@ API変更がある場合は以下を必ず含める:
 6. 管理者向けなら `requireAdmin` 等で認可を先に行う
 
 レスポンス方針:
+
 - 成功: 200/201
 - バリデーション: 400
 - 認可: 401/403
@@ -470,14 +479,17 @@ API変更がある場合は以下を必ず含める:
 #### D-1. 管理画面UIを追加/改修する場合
 
 配置方針:
+
 - `src/app/admin/**` はページ/ルーティング/レイアウト中心（薄く）
 - 再利用可能なUIは `src/components/admin/**` へ
 
 Client Component方針:
+
 - `"use client"` はUIイベントが必要な最小単位にのみ付与
 - 既存の `AdminShellClient.tsx` などの設計を優先利用
 
 フォームの方針（推奨）:
+
 - バリデーションエラーはフィールド単位で出す
 - 送信中/成功/失敗の状態を明確にする
 - 既存の `AdminForm*` / `TextInput` / `ToastHost` を優先利用する
@@ -488,14 +500,17 @@ Client Component方針:
 
 変更タイプ別に、最低限のテストを追加する。
 
-1) actionsのロジック変更:
+1)actionsのロジック変更:
+
 - `src/actions/<domain>/core.test.ts` を追加/更新
 
-2) repo変更:
+2)repo変更:
+
 - 可能ならrepoのテスト（既存の `*.repo.test.ts` に寄せる）
 - テストDBが必要な場合は README のテストDB手順に従う
 
-3) API変更:
+3)API変更:
+
 - 可能なら actions のテストでカバー（API route自体は薄く保つ）
 - API routeにロジックを入れない（テスト困難化を防ぐ）
 
@@ -515,18 +530,22 @@ Client Component方針:
 作業完了時、以下を必ず出力する:
 
 #### Summary
+
 - 何をどう変えたか（3行以内）
 
 #### Files changed
+
 - 変更ファイル一覧（箇条書き）
 
 #### How to verify
+
 - 実行コマンド
   - `pnpm test`
   - 必要に応じて `pnpm lint` / `pnpm build`
 - 画面確認手順（UIの場合）
 
 #### Notes
+
 - 破壊的変更の有無
 - 互換性/移行/注意点（あれば）
 
@@ -559,10 +578,12 @@ Client Component方針:
 - 他レイヤ（app/api/app/page/components）からは **必ず** `actions/<domain>`（=index）経由で呼ぶ。
 
 例（呼び出し）:
+
 - ✅ `import { createUser } from "@/actions/users";`
 - ❌ `import { createUserCore } from "@/actions/users/core";`
 
 例外:
+
 - テスト（`*.test.ts`）で内部関数を参照する必要がある場合のみ可（ただし可能ならindex経由を優先）。
 
 ---
@@ -604,13 +625,16 @@ Client Component方針:
 #### L-1. JSONレスポンスは `{ ok, data } / { ok, error }` に統一
 
 成功:
+
 - `200/201`:
   - `{ ok: true, data: ... }`
 
 失敗:
+
 - `{ ok: false, error: { code, message, details? } }`
 
 例:
+
 - `code`: `VALIDATION_ERROR` / `UNAUTHORIZED` / `FORBIDDEN` / `NOT_FOUND` / `CONFLICT` / `INTERNAL`
 
 #### L-2. エラーのdetails
@@ -734,11 +758,13 @@ PR説明（または最終回答）に必ず次の見出しを含める:
 #### 1-1. Clerk（認証/認可）
 
 配置:
+
 - `src/lib/auth/role.ts` : ロール/権限の定義・判定（追加はここ）
 - `src/lib/auth/requireAdmin.ts` : 管理者権限の強制（admin/APIで必須）
 - `src/types/clerk.d.ts` : Clerkの型補完（必要に応じて追記）
 
 ルール:
+
 - 認可はUI表示だけで守らない（API/サーバ側で必ず守る）
 - admin系:
   - `src/app/admin/**` は表示前に認可（既存パターンを踏襲）
@@ -749,6 +775,7 @@ PR説明（または最終回答）に必ず次の見出しを含める:
 #### 1-2. Drizzle（DB・永続化）
 
 配置:
+
 - `src/db/schema.ts` : テーブル定義
 - `src/db/client.ts` : Drizzle client / DB接続
 - `src/db/index.ts`  : db export の集約（あればここ経由）
@@ -758,6 +785,7 @@ PR説明（または最終回答）に必ず次の見出しを含める:
 - `src/db/cli.ts` : CLI実行の入口（既存通り）
 
 ルール:
+
 - **app/actions/components から Drizzle client を直接呼ばない**
 - DB例外/一意制約等の扱いは `src/lib/db-errors.ts` の既存方針を優先
 - schema変更は migration を基本（`db:generate` → `db:migrate`）
@@ -768,11 +796,13 @@ PR説明（または最終回答）に必ず次の見出しを含める:
 #### 1-3. Docker（ローカルDB/開発環境）
 
 配置（推奨）:
+
 - `compose.yaml` / `docker-compose.yml` : compose本体（既存に合わせる）
 - `.env` : Docker Compose用（`COMPOSE_PROJECT_NAME` 等、コミット可）
 - `.env.local` : Next/Clerk/DB接続用（コミット禁止）
 
 ルール:
+
 - `.env.local` の値は出力しない（キー名のみ列挙）
 - composeのサービス名/ホスト名は README の手順（例: `-hmysql`）を尊重
 - DB初期化は `pnpm db:reset` / `pnpm db:reset:test` を優先（手動SQLは必要時のみ）
@@ -782,10 +812,12 @@ PR説明（または最終回答）に必ず次の見出しを含める:
 ### 2) 環境変数（キーの扱い）
 
 #### 2-1. `.env.local`（コミット禁止）
+
 - Next.js 実行に必要なキーを置く
 - Clerkキー、DB URL、テストDB URL をここに集約
 
 例（キー名のみ。値は出力しない）:
+
 - `DATABASE_URL`
 - `DATABASE_URL_TEST`
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
@@ -793,6 +825,7 @@ PR説明（または最終回答）に必ず次の見出しを含める:
 - （必要なら）`CLERK_SIGN_IN_URL` / `CLERK_SIGN_UP_URL` 等
 
 #### 2-2. `.env`（Docker Compose用・コミット可）
+
 - `COMPOSE_PROJECT_NAME="..."` など、composeの安定稼働に必要な値のみ
 
 ---
@@ -800,12 +833,14 @@ PR説明（または最終回答）に必ず次の見出しを含める:
 ### 3) DB運用（開発・テスト）
 
 #### 3-1. 初回/リセット
+
 - 初回セットアップ（破壊的）:
   - `pnpm db:reset`
 - テストDB完全リセット（破壊的）:
   - `pnpm db:reset:test`
 
 #### 3-2. スキーマ変更
+
 - migration作成:
   - `pnpm db:generate`
 - migration適用:
@@ -814,12 +849,14 @@ PR説明（または最終回答）に必ず次の見出しを含める:
   - `pnpm db:migrate:test`
 
 #### 3-3. seed
+
 - 開発DB seed:
   - `pnpm db:seed`
 - テストDB seed:
   - `pnpm db:seed:test`
 
 #### 3-4. 禁止/制限
+
 - `pnpm db:push` は原則禁止（明示指示がある場合のみ）
   - 理由: 履歴が残らずロールバック不可
 
@@ -828,6 +865,7 @@ PR説明（または最終回答）に必ず次の見出しを含める:
 ### 4) 典型的な実装パターン（Clerk × actions × repo × API）
 
 #### 4-1. 管理者限定API（例: users管理）
+
 1. `src/app/api/users/.../route.ts`
    - 先頭で `requireAdmin`
    - 入力を validation
@@ -880,6 +918,7 @@ DB（MySQL/Drizzle）は `src/db/**`、認可（Clerk/role）は `src/lib/auth/*
 ### 1) Docker（devcontainer）運用ルール
 
 #### 1-1. compose の実体
+
 - このリポジトリのローカル環境は **`.devcontainer/docker-compose.yml`** を前提とする。
 - services:
   - `app`（Next.js実行コンテナ）
@@ -888,20 +927,24 @@ DB（MySQL/Drizzle）は `src/db/**`、認可（Clerk/role）は `src/lib/auth/*
   - `minio`（MinIO）
 
 #### 1-2. 環境変数の読み込み
+
 - `app / mysql / minio` は `${PWD}/.env.local` を `env_file` として読み込む。
 - `.env.local` は **`.env.example` をコピーして作成**し、値を設定する（コミット禁止）。
 
 #### 1-3. ポート
+
 - Next.js: `3000:3000`
 - MySQL: `3306:3306`
 - Redis: `6379:6379`
 - MinIO: `9000:9000`（API）, `9001:9001`（Console）
 
 #### 1-4. 依存関係
+
 - `app` は `mysql` の healthcheck 成功後に起動する。
 - `redis` / `minio` は起動待ちのみ。
 
 #### 1-5. 禁止事項
+
 - `.env.local` の値（キーや秘密情報）をログ/レスポンス/PRに貼らない。
 - compose のサービス名（`mysql` / `redis` / `minio`）を変える場合は必ず影響範囲を説明する。
 
@@ -912,10 +955,12 @@ DB（MySQL/Drizzle）は `src/db/**`、認可（Clerk/role）は `src/lib/auth/*
 このリポジトリの `.env.local` は `.env.example` に準拠する。
 
 #### 2-1. Next.js
+
 - `NODE_ENV`
 - `NEXT_PUBLIC_APP_URL`
 
 #### 2-2. Clerk
+
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
 - `CLERK_SECRET_KEY`
 - `NEXT_PUBLIC_CLERK_SIGN_IN_URL`
@@ -923,6 +968,7 @@ DB（MySQL/Drizzle）は `src/db/**`、認可（Clerk/role）は `src/lib/auth/*
 - `NEXT_PUBLIC_CLERK_AFTER_SIGN_OUT_URL`
 
 #### 2-3. MySQL / Drizzle
+
 - `MYSQL_HOST=mysql`
 - `MYSQL_PORT=3306`
 - `MYSQL_DATABASE=app`
@@ -932,13 +978,16 @@ DB（MySQL/Drizzle）は `src/db/**`、認可（Clerk/role）は `src/lib/auth/*
 - `DATABASE_URL=mysql://app:app_password@mysql:3306/app`
 
 #### 2-4. Test DB（任意）
+
 - `DATABASE_URL_TEST=mysql://app:app_password@mysql:3306/app_test`
 
 #### 2-5. Redis
+
 - `REDIS_HOST=redis`
 - `REDIS_PORT=6379`
 
 #### 2-6. MinIO
+
 - `MINIO_ENDPOINT=http://minio:9000`
 - `MINIO_REGION=us-east-1`
 - `MINIO_ROOT_USER`
@@ -948,11 +997,13 @@ DB（MySQL/Drizzle）は `src/db/**`、認可（Clerk/role）は `src/lib/auth/*
 - `MINIO_BUCKET`
 
 #### 2-7. Seed / E2E
+
 - `ADMIN_EMAILS`
 - `E2E_ADMIN_EMAIL`
 - `E2E_ADMIN_PASSWORD`
 
 ルール:
+
 - `.env.local` の値は出力しない（必要ならキー名のみ列挙）。
 - `NEXT_PUBLIC_` 以外はサーバー専用として扱う（クライアントに露出しない）。
 
@@ -961,19 +1012,24 @@ DB（MySQL/Drizzle）は `src/db/**`、認可（Clerk/role）は `src/lib/auth/*
 ### 3) services/ の正式運用（外部境界の集約）
 
 #### 3-1. services の責務
+
 `src/services/**` は **外部依存や境界（IO）**を集約する。
+
 例:
+
 - Redis（キャッシュ/セッション/レート制限等）
 - MinIO（オブジェクトストレージ）
 - 外部HTTP API（将来追加）
 - メール送信（将来追加）
 
 禁止:
+
 - DBの永続化ロジック（それは `src/db/**`）
 - 認可判断（それは `src/lib/auth/**`）
 - UI用の整形（それは `src/actions/**`）
 
 #### 3-2. 推奨ディレクトリ構造（新規追加時）
+
 - `src/services/redis/`
   - `client.ts`（接続/クライアント生成）
   - `index.ts`（公開API）
@@ -987,6 +1043,7 @@ DB（MySQL/Drizzle）は `src/db/**`、認可（Clerk/role）は `src/lib/auth/*
   - `errors.ts`
 
 #### 3-3. 公開点の統一
+
 - services も actions と同様に **`index.ts` を唯一の公開点**とする。
 - `client.ts` は内部実装（必要ならテストでのみ参照）。
 
@@ -1023,6 +1080,7 @@ DB（MySQL/Drizzle）は `src/db/**`、認可（Clerk/role）は `src/lib/auth/*
 - ルーティング（`app/api/**`）は薄く保ち、validation → actions → response
 
 例:
+
 - `app/api/...` → `actions/users` → `db/users.repo.ts`
 - `app/api/...` → `actions/...` → `services/minio`（署名URL発行など）
 
@@ -1031,10 +1089,12 @@ DB（MySQL/Drizzle）は `src/db/**`、認可（Clerk/role）は `src/lib/auth/*
 ### 6) Seed / E2E の扱い
 
 #### 6-1. Seed（ADMIN_EMAILS）
+
 - seed に関する値は `.env.local` の `ADMIN_EMAILS` を利用する（値は出力しない）。
 - seed 実装は既存の `src/db/seed.ts` / `pnpm db:seed` の方針を尊重する。
 
 #### 6-2. E2E（E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD）
+
 - E2E用の認証情報は `.env.local` で管理し、コードやREADMEに値を書かない。
 - E2Eテストに影響する変更は「How to verify」に Playwright 実行手順を含める。
 

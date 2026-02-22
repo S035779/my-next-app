@@ -1,5 +1,7 @@
-import Link from 'next/link';
-
+/**
+ * 参照権限なしページ
+ * @returns 参照権限なしページコンポーネント
+ */
 export default function AdminForbiddenPage() {
   return (
     <div data-testid="forbidden">

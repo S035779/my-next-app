@@ -23,8 +23,7 @@
     "test:watch": "pnpm test:db && vitest",
     "test:db": "dotenv -e .env.local -- sh -c 'DB_URL=$DATABASE_URL_TEST tsx src/db/reset.ts && DATABASE_URL=$DATABASE_URL_TEST drizzle-kit migrate && DATABASE_URL=$DATABASE_URL_TEST tsx src/db/seed.ts'",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report --host 0.0.0.0 --port 9323"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.36.10",

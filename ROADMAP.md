@@ -75,14 +75,14 @@
 - Clerk 導入（App Router 対応）
 - role.ts による role 判定の正規化
 - requireAdmin() の単一責務化
-- proxy.ts で /admin/* をログイン必須に
+- proxy.ts で /admin/\* をログイン必須に
 - 403 / 未ログイン UX の整理
 
 ### 完了条件
 
 - 未ログイン → sign-in
 - 非admin → 403
-- admin → /admin/* 表示
+- admin → /admin/\* 表示
 
 ## ⑥ DB “制約とエラー” を本番想定に整える
 
@@ -123,7 +123,7 @@
 ### 作業内容
 
 - レイアウト責務の単一化（AdminShell）
-- 余白設計（A案：フル幅） ← 完了
+- 余白設計（A案：フル幅）
 - 一覧の検索 / ソート / ページング
 - 編集・削除 UX 改善
 - ナビ・パンくずの最終調整

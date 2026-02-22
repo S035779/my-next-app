@@ -14,6 +14,7 @@ import AdminNav, { type NavSection } from './AdminNav';
 import Breadcrumbs from './Breadcrumbs';
 import { cn } from '../../lib/cn';
 import LogoutButton from './LogoutButton';
+import ToastHost from './ToastHost';
 
 const navSections: NavSection[] = [
   {
@@ -213,6 +214,8 @@ export default function AdminShellClient({
             管理者権限
           </div>
         </header>
+
+        <ToastHost />
 
         <main className="p-4 bg-gray-50">
           <div className="w-full bg-white border border-gray-200 rounded-2xl p-4">

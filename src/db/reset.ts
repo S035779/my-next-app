@@ -1,4 +1,9 @@
 import mysql from 'mysql2/promise';
+import type { RowDataPacket } from 'mysql2/promise';
+
+type TableRow = RowDataPacket & {
+  table_name: string;
+};
 
 async function main() {
   const url = process.env.DB_URL ?? process.env.DATABASE_URL;
@@ -10,7 +15,7 @@ async function main() {
   // 2) Drop all tables (disable FK)
   await conn.query('SET FOREIGN_KEY_CHECKS = 0');
 
-  const [rows] = await conn.query<any[]>(
+  const [rows] = await conn.query<TableRow[]>(
     'SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()',
   );
 

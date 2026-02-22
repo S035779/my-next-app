@@ -136,6 +136,40 @@ mysql -hmysql -uapp -p"$MYSQL_ROOT_PASSWORD" app_test -e "SELECT * FROM users;"
 pnpm test
 ```
 
+## E2E Testing
+
+以下のコマンドでE2Eテストのリストを確認することができます:
+
+```bash
+pnpm exec playwright test --list
+```
+
+依存関係をインストールします:
+
+```bash
+pnpm exec playwright install
+pnpm exec playwright install-deps
+```
+
+E2Eテストを実行するには、以下のコマンドを使用します:
+
+```bash
+pnpm exec playwright test
+```
+
+特定のE2Eテストを実行するには、以下のコマンドを使用します:
+
+```bash
+pnpm exec playwright test tests/admin/users.crud.spec.ts
+pnpm exec playwright test tests/admin/users.pagination.spec.ts
+```
+
+レポートを参照するには、以下のコマンドを使用します:
+
+```bash
+pnpm exec playwright show-report --host 0.0.0.0
+```
+
 ## Learn More
 
 Next.js についてもっと知るには、以下のリソースを確認してください:

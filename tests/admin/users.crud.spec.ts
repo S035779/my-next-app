@@ -9,7 +9,7 @@ test.describe('admin users CRUD (fully testid based)', () => {
     page,
   }) => {
     await page.goto('/admin/users');
-    await expect(page).toHaveURL(/\/admin\/users/);
+    await expect(page.getByTestId('page-title')).toHaveText('ユーザー管理');
 
     // =========================================================
     // 1) 作成
@@ -22,11 +22,11 @@ test.describe('admin users CRUD (fully testid based)', () => {
     await page.getByTestId('user-name').fill(name1);
     await page.getByTestId('user-submit').click();
 
-    await expect(page).toHaveURL(/\/admin\/users\/\d+$/);
+    await expect(page).toHaveURL(/\/admin\/users\/\d+\/?(?:\?.*)?$/);
 
     // id抽出
     const url1 = page.url();
-    const id1 = url1.match(/\/admin\/users\/(\d+)$/)?.[1];
+    const id1 = url1.match(/\/admin\/users\/(\d+)(?:\?.*)?$/)?.[1];
     expect(id1).toBeTruthy();
 
     // 一覧へ戻る
@@ -72,8 +72,8 @@ test.describe('admin users CRUD (fully testid based)', () => {
     await page.getByTestId('user-name').fill('User Two');
     await page.getByTestId('user-submit').click();
 
-    await expect(page).toHaveURL(/\/admin\/users\/\d+$/);
-    const id2 = page.url().match(/\/admin\/users\/(\d+)$/)?.[1];
+    await expect(page).toHaveURL(/\/admin\/users\/\d+\/?(?:\?.*)?$/);
+    const id2 = page.url().match(/\/admin\/users\/(\d+)(?:\/)?(?:\?.*)?$/)?.[1];
     expect(id2).toBeTruthy();
 
     await page.getByTestId('user-email').fill(email1);
@@ -92,7 +92,8 @@ test.describe('admin users CRUD (fully testid based)', () => {
     const deletedUrl = page.url(); // id2の編集画面
 
     await page.getByTestId('user-delete').click();
-    await expect(page).toHaveURL(/\/admin\/users$/);
+    await page.getByTestId('confirm-ok').click();
+    await expect(page).toHaveURL(/\/admin\/users\/?(?:\?.*)?$/);
 
     const res = await page.goto(deletedUrl);
     expect(res?.status()).toBe(404);

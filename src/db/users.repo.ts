@@ -1,8 +1,37 @@
 import { users } from './schema';
-import { desc, eq } from 'drizzle-orm';
+import { or, like, count, desc, eq } from 'drizzle-orm';
 import type { AppDb } from './types';
 
+export type Paged<T> = {
+  rows: T[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+  q?: string;
+};
+
+function normalizePage(page: number): number {
+  return Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+}
+
+function normalizePerPage(perPage: number): number {
+  const n = Number.isFinite(perPage) && perPage > 0 ? Math.floor(perPage) : 20;
+  // 暴走防止：上限
+  return Math.min(Math.max(n, 1), 100);
+}
+
+function normalizeQ(q?: string): string | undefined {
+  const v = (q ?? '').trim();
+  return v.length > 0 ? v : undefined;
+}
+
 export function usersRepo(db: AppDb) {
+  /**
+   *
+   * @param result
+   * @returns
+   */
   const getAffectedRows = (result: unknown) => {
     if (!result || typeof result !== 'object') return 0;
     const r = result as {
@@ -13,19 +42,78 @@ export function usersRepo(db: AppDb) {
     return Number(r.affectedRows ?? r.rowsAffected ?? r.rowCount ?? 0);
   };
 
+  /**
+   * ユーザー一覧を取得
+   * @param limit 取得上限件数（デフォルト: 50）
+   * @returns ユーザー配列
+   */
   const listUsers = (limit = 50) => {
     return db.select().from(users).orderBy(desc(users.id)).limit(limit);
   };
 
-  const findUserById = async (id: number) => {
+  /**
+   * ユーザー一覧を取得（ページネーション）
+   * @param limit 取得上限件数
+   * @param perPage ページ行数
+   * @param q? クエリ
+   * @returns ユーザー配列
+   */
+  const listUsersPage = async (
+    page: number,
+    perPage: number,
+    q?: string,
+  ): Promise<Paged<{ id: number; email: string; name: string | null }>> => {
+    const safePage = normalizePage(page);
+    const safePerPage = normalizePerPage(perPage);
+    const safeQ = normalizeQ(q);
+
+    const offset = (safePage - 1) * safePerPage;
+
+    const whereExpr = safeQ
+      ? or(like(users.email, `%${safeQ}%`), like(users.name, `%${safeQ}%`))
+      : undefined;
+
     const rows = await db
-      .select()
+      .select({ id: users.id, email: users.email, name: users.name })
       .from(users)
-      .where(eq(users.id, id))
-      .limit(1);
+      .where(whereExpr)
+      .orderBy(desc(users.id))
+      .limit(safePerPage)
+      .offset(offset);
+
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(users)
+      .where(whereExpr);
+
+    const totalPages = Math.max(1, Math.ceil(total / safePerPage));
+    const clampedPage = Math.min(safePage, totalPages);
+
+    return {
+      rows,
+      total,
+      page: clampedPage,
+      perPage: safePerPage,
+      totalPages,
+      q: safeQ,
+    };
+  };
+
+  /**
+   * ユーザーIDでユーザーを取得
+   * @param id ユーザーID
+   * @returns ユーザー情報、存在しない場合は null
+   */
+  const findUserById = async (id: number) => {
+    const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return rows[0] ?? null;
   };
 
+  /**
+   * メールアドレスでユーザーIDを取得
+   * @param email メールアドレス
+   * @returns ユーザーID、存在しない場合は null
+   */
   const findUserIdByEmail = async (email: string) => {
     const rows = await db
       .select({ id: users.id })
@@ -35,6 +123,12 @@ export function usersRepo(db: AppDb) {
     return rows[0]?.id ?? null;
   };
 
+  /**
+   * ユーザー作成
+   * @param email メールアドレス
+   * @param name 名前
+   * @returns 作成したユーザーのID
+   */
   const createUser = async (
     email: string,
     name: string | null,
@@ -51,6 +145,13 @@ export function usersRepo(db: AppDb) {
     return id;
   };
 
+  /**
+   * ユーザー更新
+   * @param id ユーザーID
+   * @param email メールアドレス
+   * @param name 名前
+   * @returns 更新に成功したかどうか
+   */
   const updateUser = async (
     id: number,
     email: string,
@@ -67,6 +168,11 @@ export function usersRepo(db: AppDb) {
     return !!exists;
   };
 
+  /**
+   * ユーザー削除
+   * @param id ユーザーID
+   * @returns 削除に成功したかどうか
+   */
   const deleteUser = async (id: number): Promise<boolean> => {
     const result = await db.delete(users).where(eq(users.id, id));
     const affected = getAffectedRows(result);
@@ -76,49 +182,12 @@ export function usersRepo(db: AppDb) {
   };
 
   return {
-    /**
-     * ユーザー一覧を取得
-     * @param limit 取得上限件数（デフォルト: 50）
-     * @returns ユーザー配列
-     */
     listUsers,
-
-    /**
-     * ユーザーIDでユーザーを取得
-     * @param id ユーザーID
-     * @returns ユーザー情報、存在しない場合は null
-     */
+    listUsersPage,
     findUserById,
-
-    /**
-     * メールアドレスでユーザーIDを取得
-     * @param email メールアドレス
-     * @returns ユーザーID、存在しない場合は null
-     */
     findUserIdByEmail,
-
-    /**
-     * ユーザー作成
-     * @param email メールアドレス
-     * @param name 名前
-     * @returns 作成したユーザーのID
-     */
     createUser,
-
-    /**
-     * ユーザー更新
-     * @param id ユーザーID
-     * @param email メールアドレス
-     * @param name 名前
-     * @returns 更新に成功したかどうか
-     */
     updateUser,
-
-    /**
-     * ユーザー削除
-     * @param id ユーザーID
-     * @returns 削除に成功したかどうか
-     */
     deleteUser,
   };
 }

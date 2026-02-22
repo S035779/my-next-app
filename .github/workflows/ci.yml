@@ -44,6 +44,9 @@ jobs:
       # Next/Playwright が localhost を見る前提（あなたの baseURL に合わせる）
       NEXT_PUBLIC_APP_URL: http://localhost:3000
 
+      # テスト専用 Seed API用トークン
+      E2E_SEED_TOKEN: ${{ secrets.E2E_SEED_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
 
