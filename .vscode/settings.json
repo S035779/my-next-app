@@ -1,9 +1,38 @@
 {
+  // General editor settings
+  "editor.wordWrap": "on",
+  "editor.formatOnType": true,
   "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "eslint.validate": [
-    "typescript",
-    "typescriptreact"
-  ],
-  "postman.settings.dotenv-detection-notification-visibility": false
+  // ESLint settings
+  "eslint.validate": ["typescript", "typescriptreact"],
+  // Postman extension settings
+  "postman.settings.dotenv-detection-notification-visibility": false,
+  // Markdown specific settings
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+  },
+  // TypeScript specific settings
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  // Auto save
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  // Spell check
+  "cSpell.language": "en,ja",
+  "cSpell.enabledFileTypes": {
+    "markdown": true
+  },
+  "cSpell.words": ["varchar"],
+  // Snippet settings
+  "editor.suggest.snippetsPreventQuickSuggestions": false,
+  "editor.tabCompletion": "on",
+  "editor.snippetSuggestions": "top"
 }

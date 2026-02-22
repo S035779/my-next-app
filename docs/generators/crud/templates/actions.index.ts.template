@@ -1,0 +1,9 @@
+export {
+  list<ResourcePlural>,
+  get<Resource>ById,
+  create<Resource>,
+  update<Resource>,
+  delete<Resource>,
+} from "./core";
+
+export type { <Resource>, <CreateInput>, <UpdateInput> } from "./types";

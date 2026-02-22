@@ -14,6 +14,8 @@ docs > code
 
 ## 構成
 
+- ai: AIプロンプト・ルール
+- generators: コードジェネレーターのテンプレートとルール
 - requirements : 要件定義
 - architecture : アーキテクチャ設計
 - database : DB設計
@@ -28,6 +30,52 @@ docs > code
 docs/
   README.md
 
+  ai/
+    codex-prompts.md
+    workflows/
+      00-bootstrap.md
+      10-crud-generator.md
+      20-migration-generator.md
+      30-seed-generator.md
+      40-playwright-generator.md
+      50-storybook-generator.md
+      90-spec-code-diff.md
+
+  generators/
+    crud/
+      feature-spec.template.md
+      checklist.md
+      naming.md
+      files.md
+      templates/
+        actions.core.ts.template
+        actions.types.ts.template
+        actions.validation.ts.template
+        actions.index.ts.template
+        actions.core.test.ts.template
+        db.repo.ts.template
+        api.route.ts.template
+        ui.admin.list.page.tsx.template
+        ui.admin.form.client.tsx.template
+        ui.admin.components.tsx.template
+    
+    database/
+      er-to-schema.rules.md
+      schema.template.md
+      migration.template.md
+      seed.template.md
+      e2e-fixtures.template.md
+
+    playwright/
+      e2e-spec.template.md
+      selectors.rules.md
+      scenarios.template.md
+
+    storybook/
+      setup.md
+      stories.template.tsx
+      conventions.md
+  
   requirements/
     system.md
     user-stories.md

@@ -1,0 +1,13 @@
+import { z } from "zod";
+
+export const idSchema = z.object({
+  id: z.string().min(1),
+});
+
+export const createSchema = z.object({
+  // TODO: fields
+});
+
+export const updateSchema = z.object({
+  // TODO: fields (partial)
+}).partial();

@@ -10,3 +10,4 @@ erDiagram
   }
 
   USERS ||--o{ POSTS : owns
+```

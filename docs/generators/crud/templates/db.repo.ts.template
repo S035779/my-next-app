@@ -1,0 +1,25 @@
+import { db } from "@/db/client";
+// import { <table> } from "@/db/schema";
+
+export const <repoName> = {
+  async list() {
+    // TODO: query
+    return [];
+  },
+  async findById(id: string) {
+    // TODO: query
+    return null as any;
+  },
+  async insert(input: any) {
+    // TODO: query
+    return null as any;
+  },
+  async updateById(id: string, input: any) {
+    // TODO: query
+    return null as any;
+  },
+  async deleteById(id: string) {
+    // TODO: query
+    return false;
+  },
+};
