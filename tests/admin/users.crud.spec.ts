@@ -92,6 +92,7 @@ test.describe('admin users CRUD (fully testid based)', () => {
     const deletedUrl = page.url(); // id2の編集画面
 
     await page.getByTestId('user-delete').click();
+    await page.getByTestId('confirm-ok').click();
     await expect(page).toHaveURL(/\/admin\/users\/?(?:\?.*)?$/);
 
     const res = await page.goto(deletedUrl);

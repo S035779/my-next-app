@@ -32,6 +32,7 @@ test('admin: delete -> removed from list -> edit page becomes 404', async ({
 
   // 2) 削除
   await page.getByTestId('user-delete').click();
+  await page.getByTestId('confirm-ok').click();
 
   // 3) 一覧に戻る
   await expect(page).toHaveURL(/\/admin\/users\/?(?:\?.*)?$/);
