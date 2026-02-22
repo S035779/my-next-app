@@ -5,6 +5,10 @@
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // File settings
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "files.eol": "\n",
   // ESLint settings
   "eslint.validate": ["typescript", "typescriptreact"],
   // Postman extension settings
@@ -23,7 +27,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   // JSON specific settings
-   "[json]": {
+  "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   // Auto save

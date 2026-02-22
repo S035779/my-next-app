@@ -1,4 +1,4 @@
-# chapger-two-student-app リポジトリ作業ルール（AGENTS.override.md）
+# リポジトリ作業ルール（AGENTS.override.md）
 
 これは Next.js + TypeScript プロジェクト（my-next-app）で、Codex（エージェント）が作業するためのルールです。
 
